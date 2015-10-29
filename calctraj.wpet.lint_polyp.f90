@@ -793,7 +793,7 @@ CONTAINS
 
     f = prof
    
-    DO j=2,n
+    DO j=1,n
        DO i=n,j+1,-1
           f(i) = ( (inp-psub(i-j))*f(i) - (inp-psub(i))*f(i-1) ) / ( psub(i)-psub(i-j) )
        END DO
