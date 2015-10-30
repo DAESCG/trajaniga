@@ -1,16 +1,17 @@
 SHELL = /bin/bash
 
 GF95 = -O1 -ffree-form -fno-second-underscore -m64 -fPIC -I.
-INTL = -O3 -free -L -lgfortran -assume byterecl -convert big_endian
-
+INTL = -fPIC -O3 -free -assume byterecl -convert big_endian -static-intel 
+LD = -Wl,-rpath,/unidata/intel/lib
 #FC=gfortran $(GF95)
-FC = ifort $(INTL)
+FF = ifort
+FC = $(FF) $(INTL) -c
 
 
 debug = -g -traceback -check all -fp-stack-check
 
 #NCFLAGS = -limf -g -O2 -I/unidata/64/include -L/unidata/64/lib -lnetcdff -lnetcdf -lnetcdf #`nf-config --fflags --flibs`
-NCLIBS = -L/unidata/intel/lib -lnetcdf -lnetcdff -L/unidata/intel/lib -lhdf5_hl -lhdf5
+NCLIBS = -L/unidata/intel/lib -lhdf5_hl -lhdf5 -lnetcdf -lnetcdff 
 INCFLAGS = -I/unidata/intel/include
 
 CODE = global_mod.f90\
@@ -27,11 +28,19 @@ CODE = global_mod.f90\
 #	$(FC) $(NCLIBS) $(INCFLAGS) $? $(?F:.f90=.o)
 
 simtraj:
-	$(FC) $(NCLIBS) $(INCFLAGS) $(CODE) -o simtraj_lint_polyp 
-	rm -f *.mod
+#	$(FC) $(NCLIBS) $(INCFLAGS) $(CODE) -o simtraj_lint_polyp 
+#	$(FC) global_mod.f90
+#	$(FC) read_namelist.f90
+#	$(FC) $(NCLIBS) $(INCFLAGS) checkinp.f90
+#	$(FC) $(NCLIBS) $(INCFLAGS) writetraj.f90
+#	$(FC) $(NCLIBS) $(INCFLAGS) calctraj.wpet.lint_polyp.f90
+#	$(FC) $(NCLIBS) $(INCFLAGS) simtraj.f90
+	$(FC) $(NCLIBS) $(INCFLAGS) $(CODE)
+	$(FF) $(LD) -o simtraj_lint_polyp *.o $(NCLIBS) 
+	rm -f *.o *.mod
 
 clean:
-	rm -f *.mod simtraj_lint_polyp
+	rm -f *.mod *.0 simtraj_lint_polyp
 
 
 #
